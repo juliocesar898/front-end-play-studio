@@ -2,40 +2,45 @@ import { createContext, useState, useContext, useEffect } from 'react';
 import { registerRequest, loginRequest, userProfile } from '../api/auth';
 import Cookies from 'js-cookie';
 
-export const AuthContext = createContext()
+export const AuthContext = createContext();
 
 export const useAuth = () => {
-  const context = useContext(AuthContext)
+  const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider')
+    throw new Error('useAuth must be used within an AuthProvider');
   }
-  return context
-}
+  return context;
+};
 
 export const AuthProvider = ({ children }) => {
-
-  const [user, setUser] = useState(null)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const signup = async (user) => {
     try {
-      await registerRequest(user)
+      await registerRequest(user);
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   const signin = async (user) => {
     try {
-      const res = await loginRequest(user)
+      const res = await loginRequest(user);
       console.log(res);
-      Cookies.set('token', res.data.token)
-      setIsAuthenticated(true)
+      Cookies.set('token', res.data.token);
+      setIsAuthenticated(true);
     } catch (error) {
-      setIsAuthenticated(false)
+      setIsAuthenticated(false);
     }
-  }
+  };
+
+  const logout = () => {
+    Cookies.remove('token');
+    setIsAuthenticated(false);
+    setUser(null);
+  };
 
   useEffect(() => {
     const checkLogin = async () => {
@@ -54,7 +59,7 @@ export const AuthProvider = ({ children }) => {
         setUser(res.data);
         setLoading(false);
       } catch (error) {
-        Cookies.remove('token')
+        Cookies.remove('token');
         setIsAuthenticated(false);
         setLoading(false);
       }
@@ -63,8 +68,9 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ signup, signin, user, isAuthenticated, loading }}>
+    <AuthContext.Provider
+      value={{ signup, signin, user, isAuthenticated, loading, logout }}>
       {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};

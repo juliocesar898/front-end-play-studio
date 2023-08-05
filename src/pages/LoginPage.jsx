@@ -13,7 +13,7 @@ function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/profile')
+      navigate('/bets')
     }
   }, [isAuthenticated])
 
